@@ -1,11 +1,14 @@
+import numpy as np
+
 class JointController:
-	def __init__(self, joint):
+	def __init__(self, joint, name = ""):
 		self.joint = joint
+		self.name = name
 		self.current_angle = self.joint.angle 
 
 		self.P = 10
 		self.I = 0.01
-		self.D = 1
+		self.D = 2
 
 		self.prev_error = 0
 		self.error_sum = 0
@@ -23,8 +26,13 @@ class JointController:
 		self.prev_error = error
 		self.error_sum += error
 
+	def GetVelocity(self):
+		return self.joint.speed
+
 	def SetVelocity(self, velocity):
 		self.joint.motorSpeed = velocity
 
 	def GetAngle(self):
+		# if self.name == "j1":
+		# 	return self.joint.angle - np.pi/2
 		return self.joint.angle 

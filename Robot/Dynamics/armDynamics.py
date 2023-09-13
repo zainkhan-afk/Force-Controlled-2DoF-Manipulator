@@ -2,18 +2,24 @@ import numpy as np
 from utils import *
 
 class ArmDynamics:
-	def __init__(self, link_1, link_2, joint_1, joint_2):
-		self.link_1 = link_1
-		self.link_2 = link_2
-		self.joint_1 = joint_1
-		self.joint_2 = joint_2
+	def __init__(self, l1, l2, m1, m2):
+		self.m1 = m1
+		self.m2 = m2
 
+		self.l1 = l1
+		self.l2 = l2
 
-	def GetMassMatrix(self):
-		r11 = self.link_2.body.mass*self.link_2.height**2 + 2*self.link_1.height*self.link_2.height*self.link_2.body.mass*np.cos(self.joint_2.angle) + self.link_1.width*(self.link_2.body.mass + self.link_1.body.mass)
-		r12 = self.link_2.body.mass*self.link_2.height**2 +   self.link_1.height*self.link_2.height*self.link_2.body.mass*np.cos(self.joint_2.angle)
-		r21 = self.link_2.body.mass*self.link_2.height**2 +   self.link_1.height*self.link_2.height*self.link_2.body.mass*np.cos(self.joint_2.angle)
-		r22 = self.link_2.body.mass*self.link_2.height**2
+	def GetMassMatrix(self, state):
+		theta1 = state.theta[0]
+		theta2 = state.theta[1]
+
+		# theta1 = self.joint_1.GetAngle()
+		# theta2 = self.joint_2.GetAngle()
+
+		r11 = self.m2*self.l2**2 + 2*self.l1*self.l2*self.m2*np.cos(theta2) + (self.l1**2)*(self.m2 + self.m1)
+		r12 = self.m2*self.l2**2 +   self.l1*self.l2*self.m2*np.cos(theta2)
+		r21 = r12
+		r22 = self.m2*self.l2**2
 		M = np.array([
 						[r11, r12],
 						[r21, r22]
@@ -21,11 +27,24 @@ class ArmDynamics:
 
 		return M
 
-	def GetCoriolisMatrix(self):
-		a = -self.link_1.height*self.link_2.height*self.link_2.body.mass*np.sin(self.joint_2.angle)*self.joint_2.motorSpeed**2
-		b = -2*self.link_1.height*self.link_2.height*self.link_2.body.mass*np.sin(self.joint_2.angle)*self.joint_2.motorSpeed*self.joint_1.motorSpeed
+	def GetCoriolisMatrix(self, state):
+		theta1 = state.theta[0]
+		theta2 = state.theta[1]
+
+		theta1_dot = state.theta_dot[0]
+		theta2_dot = state.theta_dot[1]
+
+		# theta1 = self.joint_1.GetAngle()
+		# theta2 = self.joint_2.GetAngle()
+
+		# theta1_dot = self.joint_1.GetVelocity()
+		# theta2_dot = self.joint_2.GetVelocity()
+
+
+		a = -  self.l1*self.l2*self.m2*np.sin(theta2)*theta2_dot**2
+		b = -2*self.l1*self.l2*self.m2*np.sin(theta2)*theta2_dot*theta1_dot
 		r11 = a + b
-		r21 = self.link_1.height*self.link_2.height*self.link_2.body.mass*np.sin(self.joint_2.angle)*self.joint_1.motorSpeed**2
+		r21 =  self.l1*self.l2*self.m2*np.sin(theta2)*theta1_dot**2
 		C = np.array([
 						[r11],
 						[r21]
@@ -33,11 +52,23 @@ class ArmDynamics:
 
 		return C
 
-	def GetGravityMatrix(self):
-		a = self.link_2.height*self.link_2.body.mass*gravity*np.cos(self.joint_1.angle)*np.cos(self.joint_2.angle)
-		b = (self.link_2.body.mass + self.link_1.body.mass)* self.link_1.height*gravity*np.cos(self.joint_1.angle)
+	def GetGravityMatrix(self, state):
+		theta1 = state.theta[0]
+		theta2 = state.theta[1]
+
+		theta1_dot = state.theta_dot[0]
+		theta2_dot = state.theta_dot[1]
+
+		# theta1 = self.joint_1.GetAngle()
+		# theta2 = self.joint_2.GetAngle()
+
+		# theta1_dot = self.joint_1.GetVelocity()
+		# theta2_dot = self.joint_2.GetVelocity()
+
+		a = self.l2*self.m2*gravity*np.cos(theta1 + theta2)
+		b = (self.m2 + self.m1)*self.l1*gravity*np.cos(theta1)
 		r11 = a + b
-		r12 = self.link_2.body.mass*self.link_2.body.mass*gravity*np.cos(self.joint_1.angle)*np.cos(self.joint_2.angle)
+		r12 = self.m2*self.l2*gravity*np.cos(theta1 + theta2)
 		G = np.array([
 						[r11],
 						[r12]
@@ -46,16 +77,17 @@ class ArmDynamics:
 		return G
 
 
-	def ForwardDynamics(self, force, jacobian):
+	def ForwardDynamics(self, force, jacobian, state):
 		'''
 		M(q)q_dot_dot + C(q, q_dot) + g(q) = J.F
 		'''
 	
-		M = self.GetMassMatrix()
-		C = self.GetCoriolisMatrix()
-		G = self.GetGravityMatrix()
+		M = self.GetMassMatrix(state)
+		C = self.GetCoriolisMatrix(state)
+		G = self.GetGravityMatrix(state)
 
 		torques = jacobian.T@force
+		# torques = force.copy()
 
 		M_inv = GetInverseMatrix(M)
 
