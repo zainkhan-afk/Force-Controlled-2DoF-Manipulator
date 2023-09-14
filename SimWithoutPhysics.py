@@ -38,7 +38,7 @@ m2 = 0.4
 arm = Dummy(l1, l2, m1, m2)
 
 
-force = np.array([[-gravity, 0]]).T
+force = np.array([[0, -0.75]]).T
 
 reached_home = False
 while True:

@@ -14,13 +14,13 @@ class Kinematics:
 
 
 		position = np.array([[x, y]]).T
-		position = self.R_world_robot.T@position
+		# position = self.R_world_robot.T@position
 
 		return position
 
 
 	def IK(self, position):
-		position = self.R_world_robot@position
+		# position = self.R_world_robot@position
 		x = position[0, 0]
 		y = position[1, 0]
 
