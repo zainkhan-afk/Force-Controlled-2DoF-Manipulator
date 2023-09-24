@@ -4,8 +4,8 @@ import pygame
 
 class Base:
 	def __init__(self, sim_handle, position, group_index):
-		self.width  = 0.05
-		self.height = 0.05
+		self.width  = 0.01
+		self.height = 0.01
 		self.body = sim_handle.world.CreateStaticBody(
 						    position = position,
 						    shapes=polygonShape(box=(self.width, self.height)),

@@ -2,8 +2,9 @@ from Box2D.b2 import (world, polygonShape, staticBody, dynamicBody)
 import pygame
 class Ground:
 	def __init__(self, sim_handle):
+		self.position = (0, 1)
 		self.body = sim_handle.world.CreateStaticBody(
-						    position=(0, 1),
+						    position=self.position,
 						    shapes=polygonShape(box=(50, 1)),
 						)
 

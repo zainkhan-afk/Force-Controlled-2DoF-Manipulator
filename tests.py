@@ -11,7 +11,6 @@ from utils import *
 
 PPM = 50.0  # pixels per meter
 TARGET_FPS = 60
-# TIME_STEP = 0.001
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 
 sim = Simulation(width = SCREEN_WIDTH, height = SCREEN_HEIGHT, delta_T = TIME_STEP, PPM = PPM, FPS = TARGET_FPS)
@@ -30,47 +29,18 @@ while not home_pos_reached:
 	if not ret:
 		sys.exit()
 
-
-
-arm.UpdateState()
-arm.UpdateState()
 print("Reached home position.")
-
 x = 0
 y = 0
 ang = 0
 
-force = np.array([[0, 0]]).T
 
+joint_vel = np.array([0, -0.1])
 
 while True:
-	y = 1.5*np.sin(ang)
-
-	# force = np.array([x, y])
-	position = np.array([[x, y]]).T
-
-	# arm.GoTo(position)
-	arm.ApplyForce(force)
-	# arm.GoToAngle(np.pi/2, np.pi/2)
-	# EE_Pos = arm.GetEEPos()
-
-
-	# print(position, EE_Pos)
-	# EE_x = EE_Pos[0, 0]
-	# EE_y = EE_Pos[1, 0]
-
-	# if EE_x>0.1:
-	# 	print("Reversing", force)
-	# 	force[0, 0] = -10
-
-	# if EE_x<-0.1:
-	# 	print("UnReversing", force)
-	# 	force[0, 0] = 1
-
-	# print(EE_x, EE_y)
-
-	ang += 0.0001
-
 	ret = sim.Step()
+
+	arm.VerifyArmState(joint_vel)
+
 	if not ret:
 		sys.exit()

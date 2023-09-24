@@ -91,9 +91,25 @@ class ArmDynamics:
 
 		M_inv = GetInverseMatrix(M)
 
+
 		theta_double_dot = M_inv@(torques - C - G)
 
-		# print(theta_double_dot.shape)
-		# print(selection_vector)
+		theta_double_dot = np.zeros((2, 1))
 
 		return theta_double_dot, torques
+
+
+	def InverseDynamics(self, jacobian, state):
+		'''
+		M(q)q_dot_dot + C(q, q_dot) + g(q) = J.F
+		'''
+	
+		M = self.GetMassMatrix(state)
+		C = self.GetCoriolisMatrix(state)
+		G = self.GetGravityMatrix(state)
+
+		torques = M@state.theta_double_dot + C + G
+
+		print(jacobian@torques)
+
+		return torques

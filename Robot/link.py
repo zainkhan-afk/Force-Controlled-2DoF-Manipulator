@@ -3,14 +3,14 @@ from Box2D import b2Filter
 from utils import *
 
 class Link:
-	def __init__(self, sim_handle, position, width, height, group_index):
+	def __init__(self, sim_handle, position, width, height, group_index, color = (200, 200, 255)):
 		self.body = sim_handle.world.CreateDynamicBody(position=position, angle=0)
 		self.height = height
 		self.width = width
-		box = self.body.CreatePolygonFixture(box=(width, height), density=2.5, friction=0.3, filter = b2Filter(groupIndex=group_index))
+		box = self.body.CreatePolygonFixture(box=(width, height), density=7, friction=0.3, filter = b2Filter(groupIndex=group_index))
 		print("Link:", self.body.mass)
 		
-		self.color = (200, 200, 255)
+		self.color = color
 
 	def Render(self, screen, PPM):
 		H = screen.get_height()

@@ -65,7 +65,7 @@ class Dummy:
 		position = self.kine_model.FK(theta_1, theta_2)
 		return position
 
-	def ApplyForce(self, force):
+	def ApplyForce(self, force_3):
 		current_theta_1 = self.state.theta[0]
 		current_theta_2 = self.state.theta[1]
 
@@ -73,8 +73,11 @@ class Dummy:
 		# self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
 
 		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
+
+		# T_0_3 = GetTransformationMatrix(current_theta_1, 0, 0)@GetTransformationMatrix(current_theta_2, self.l1, 0)@GetTransformationMatrix(0, self.l2, 0)
 		
-		theta_double_dot, _ = self.dynamics.ForwardDynamics(force, J, self.state)
+		
+		theta_double_dot, _ = self.dynamics.ForwardDynamics(force_3, J, self.state)
 
 		# self.state = self.state.UpdateUsingAcceleration(np.array([theta_double_dot[0, 0], theta_double_dot[1, 0]]))
 
@@ -88,3 +91,11 @@ class Dummy:
 		desired_theta_2 = current_theta_2 + theta_dot_2*TIME_STEP
 
 		self.SetJointAngle(np.array([desired_theta_1, desired_theta_2]))
+
+	def SetDesiredState(self, desired_state):
+		current_theta_1 = self.state.theta[0]
+		current_theta_2 = self.state.theta[1]
+
+		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
+
+		self.dynamics.InverseDynamics(J, desired_state)

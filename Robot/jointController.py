@@ -27,7 +27,7 @@ class JointController:
 		self.error_sum += error
 
 	def GetVelocity(self):
-		return self.joint.speed
+		return self.joint.motorSpeed
 
 	def SetVelocity(self, velocity):
 		self.joint.motorSpeed = velocity

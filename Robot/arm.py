@@ -10,25 +10,26 @@ from utils import *
 from state import State
 
 class Arm:
-	def __init__(self, sim_handle, position = (0, 0)):
+	def __init__(self, sim_handle, ground, position = (0, 0)):
 		self.arm_width = 0.05
 		self.arm_segment_length = 0.8
 
 		self.home_position = np.array([[0, -1.0]]).T
 
+		self.joint_0_pos =  (position[0], position[1])
 		self.joint_1_pos =  (position[0], position[1])
 		self.joint_2_pos =  (position[0], position[1] - 2*self.arm_segment_length)
 
-
+		self.link_0_pos = (position[0], position[1] / 2)
 		self.link_1_pos = (position[0], position[1] - self.arm_segment_length)
 		self.link_2_pos = (position[0], position[1] - 3*self.arm_segment_length)
 
-		self.base   = Base(sim_handle, position, group_index = -1)
-		self.link_1 = Link(sim_handle, self.link_1_pos, self.arm_width, self.arm_segment_length, group_index = -1)
-		self.link_2 = Link(sim_handle, self.link_2_pos, self.arm_width, self.arm_segment_length, group_index = -1)
+		self.link_1 = Link(sim_handle, self.link_1_pos, self.arm_width, self.arm_segment_length, group_index = 1)
+		self.link_2 = Link(sim_handle, self.link_2_pos, self.arm_width, self.arm_segment_length, group_index = 1)
+
 
 		joint_1 = sim_handle.world.CreateRevoluteJoint(
-									bodyA = self.base.body,
+									bodyA = ground.body,
 									bodyB = self.link_1.body,
 									anchor = self.joint_1_pos,
 									maxMotorTorque = 100.0,
@@ -71,38 +72,49 @@ class Arm:
 
 		self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
 
+		# print(self.state)
+		# print(self.joint_1_controller.joint.speed, self.joint_2_controller.joint.speed)
+
+	def UpdateState(self):
+		current_theta_1 = self.joint_1_controller.GetAngle()
+		current_theta_2 = self.joint_2_controller.GetAngle()
+
+		self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
 		print(self.state)
-		print(self.joint_1_controller.joint.speed, self.joint_2_controller.joint.speed)
 
 	def ApplyForce(self, force):
 		current_theta_1 = self.joint_1_controller.GetAngle()
 		current_theta_2 = self.joint_2_controller.GetAngle()
 
-		# self.state.SetPosition(np.array([theta_1, theta_2]))
-		self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
+		print(current_theta_1*180/np.pi, current_theta_2*180/np.pi)
+
+		self.state.SetPosition(np.array([current_theta_1, current_theta_2]))
+		# self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
 
 		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
 		
 		theta_double_dot, _ = self.dynamics.ForwardDynamics(force, J, self.state)
 
-		# self.state = self.state.UpdateUsingAcceleration(np.array([theta_double_dot[0, 0], theta_double_dot[1, 0]]))
+		self.state = self.state.UpdateUsingAcceleration(np.array([theta_double_dot[0, 0], theta_double_dot[1, 0]]))
 
-		# desired_theta_1 = self.state.theta[0]
-		# desired_theta_2 = self.state.theta[1]
+		desired_theta_1 = self.state.theta[0]
+		desired_theta_2 = self.state.theta[1]
 
-		theta_dot_1 = self.joint_1_controller.GetVelocity() + theta_double_dot[0, 0]*TIME_STEP
-		theta_dot_2 = self.joint_2_controller.GetVelocity() + theta_double_dot[1, 0]*TIME_STEP
+		print(desired_theta_1*180/np.pi, desired_theta_2*180/np.pi)
 
-		desired_theta_1 = current_theta_1 + theta_dot_1*TIME_STEP
-		desired_theta_2 = current_theta_2 + theta_dot_2*TIME_STEP
+		# theta_dot_1 = self.joint_1_controller.GetVelocity() + theta_double_dot[0, 0]*TIME_STEP
+		# theta_dot_2 = self.joint_2_controller.GetVelocity() + theta_double_dot[1, 0]*TIME_STEP
+
+		# desired_theta_1 = current_theta_1 + theta_dot_1*TIME_STEP
+		# desired_theta_2 = current_theta_2 + theta_dot_2*TIME_STEP
 
 		self.joint_1_controller.SetAngle(desired_theta_1)
 		self.joint_2_controller.SetAngle(desired_theta_2)
 
+		print(self.state)
+
 
 	def Render(self, screen, PPM):
-		self.base.Render(screen, PPM)
-		
 		self.link_1.Render(screen, PPM)
 		self.link_2.Render(screen, PPM)
 
@@ -119,3 +131,17 @@ class Arm:
 	def GoToAngle(self, theta_1, theta_2):
 		self.joint_1_controller.SetAngle(theta_1)
 		self.joint_2_controller.SetAngle(theta_2)
+
+	def VerifyArmState(self, joint_vel):
+		print()
+		print(self.state.theta*180/np.pi)
+		theta_1 = self.joint_1_controller.GetAngle()
+		theta_2 = self.joint_2_controller.GetAngle()
+
+
+		print(theta_1*180/np.pi, theta_2*180/np.pi)
+
+		self.joint_1_controller.SetVelocity(joint_vel[0])
+		self.joint_2_controller.SetVelocity(joint_vel[1])
+
+		# self.state = self.state.UpdateUsingVelocity(joint_vel)
