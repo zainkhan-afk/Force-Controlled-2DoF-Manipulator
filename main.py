@@ -40,7 +40,7 @@ x = 0
 y = 0
 ang = 0
 
-force = np.array([[0, 0]]).T
+force = np.array([[0, -20]]).T
 
 
 while True:

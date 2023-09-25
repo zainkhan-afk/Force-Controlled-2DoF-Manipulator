@@ -94,7 +94,7 @@ class ArmDynamics:
 
 		theta_double_dot = M_inv@(torques - C - G)
 
-		theta_double_dot = np.zeros((2, 1))
+		# theta_double_dot = np.zeros((2, 1))
 
 		return theta_double_dot, torques
 

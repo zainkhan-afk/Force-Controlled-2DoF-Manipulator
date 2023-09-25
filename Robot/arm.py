@@ -86,10 +86,9 @@ class Arm:
 		current_theta_1 = self.joint_1_controller.GetAngle()
 		current_theta_2 = self.joint_2_controller.GetAngle()
 
-		print(current_theta_1*180/np.pi, current_theta_2*180/np.pi)
 
-		self.state.SetPosition(np.array([current_theta_1, current_theta_2]))
-		# self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
+		# self.state.SetPosition(np.array([current_theta_1, current_theta_2]))
+		self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
 
 		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
 		
@@ -100,8 +99,6 @@ class Arm:
 		desired_theta_1 = self.state.theta[0]
 		desired_theta_2 = self.state.theta[1]
 
-		print(desired_theta_1*180/np.pi, desired_theta_2*180/np.pi)
-
 		# theta_dot_1 = self.joint_1_controller.GetVelocity() + theta_double_dot[0, 0]*TIME_STEP
 		# theta_dot_2 = self.joint_2_controller.GetVelocity() + theta_double_dot[1, 0]*TIME_STEP
 
@@ -110,8 +107,6 @@ class Arm:
 
 		self.joint_1_controller.SetAngle(desired_theta_1)
 		self.joint_2_controller.SetAngle(desired_theta_2)
-
-		print(self.state)
 
 
 	def Render(self, screen, PPM):
