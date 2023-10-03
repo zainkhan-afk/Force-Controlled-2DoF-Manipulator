@@ -1,13 +1,14 @@
 import pygame
 import numpy as np
+from utils import *
+from state import State
+
 from .link import Link
 from .base import Base
 from .kinematics import Kinematics
 from .jointController import JointController
-
 from .Dynamics import ArmDynamics
-from utils import *
-from state import State
+
 
 class Arm:
 	def __init__(self, sim_handle, ground, position = (0, 0)):
@@ -54,6 +55,7 @@ class Arm:
 		self.dynamics = ArmDynamics(self.link_1.height, self.link_2.height, self.link_1.body.mass, self.link_2.body.mass)
 
 		self.state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
+		
 
 	def HomePosition(self):
 		self.GoTo(self.home_position)
@@ -140,3 +142,11 @@ class Arm:
 		self.joint_2_controller.SetVelocity(joint_vel[1])
 
 		# self.state = self.state.UpdateUsingVelocity(joint_vel)
+
+	def GetForce(self, state):
+		current_theta_1 = self.joint_1_controller.GetAngle()
+		current_theta_2 = self.joint_2_controller.GetAngle()
+		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
+		force = self.dynamics.InverseDynamics(J, state)
+
+		return force

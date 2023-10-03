@@ -108,8 +108,10 @@ class ArmDynamics:
 		C = self.GetCoriolisMatrix(state)
 		G = self.GetGravityMatrix(state)
 
-		torques = M@state.theta_double_dot + C + G
+		jacobian_T_inv = GetInverseMatrix(jacobian.T)
+		torques = M@state.theta_double_dot.reshape((2, 1)) + C + G
+		force = jacobian_T_inv@torques
 
-		print(jacobian@torques)
+		print(torques)
 
-		return torques
+		return force
