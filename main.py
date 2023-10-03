@@ -6,6 +6,7 @@ from Robot import Arm
 from ground import Ground
 
 from utils import *
+from state import State
 
 
 
@@ -36,11 +37,15 @@ arm.UpdateState()
 arm.UpdateState()
 print("Reached home position.")
 
+desired_state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
+
 force = np.array([[0, 0]]).T
 
 
 while True:
-	arm.ApplyForce(force)
+	force = arm.GetForce(desired_state)
+	# print(force)
+	# arm.ApplyForce(force)
 
 	ret = sim.Step()
 	if not ret:

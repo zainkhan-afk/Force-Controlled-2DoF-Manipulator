@@ -140,3 +140,11 @@ class Arm:
 		self.joint_2_controller.SetVelocity(joint_vel[1])
 
 		# self.state = self.state.UpdateUsingVelocity(joint_vel)
+
+	def GetForce(self, state):
+		current_theta_1 = self.joint_1_controller.GetAngle()
+		current_theta_2 = self.joint_2_controller.GetAngle()
+		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
+		force = self.dynamics.InverseDynamics(J, state)
+
+		return force
