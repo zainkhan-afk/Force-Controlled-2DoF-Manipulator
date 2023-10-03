@@ -40,7 +40,6 @@ print("Reached home position.")
 
 desired_state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
 
-force = np.array([[0, -30]]).T
 goal_pos = np.array([0, -1])
 
 ang = 0
