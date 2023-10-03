@@ -1,12 +1,22 @@
 import numpy as np
 
 class PID:
-	def __init__(self):
-		self.P = 0;
-		self.I = 0;
-		self.D = 0;
+	def __init__(self, P = 300, I = 0, D = 50):
+		self.P = P;
+		self.I = I;
+		self.D = D;
 
-		self.error = np.arra([0, 0])
+		# self.error = np.array([0, 0])
+		self.prev_error = np.array([0, 0]).astype("float32")
+		self.error_sum = np.array([0, 0]).astype("float32")
 
-	def CalculateForce(self, robot_ee_pos, goal_pos):
-		pass
+	def CalculateForce(self, ee_pos, goal_pos):
+		error = goal_pos - ee_pos.ravel()
+
+		force = self.P*error + self.D*(self.prev_error - error) + self.I*self.error_sum
+
+		self.prev_error = error
+		self.error_sum += error
+		# print(self.prev_error, error)
+		force = force.reshape(2, 1)
+		return force
