@@ -9,6 +9,8 @@ class Kinematics:
 		self.R_world_robot = GetRotationMatrix(np.pi/2)
 
 	def FK(self, theta_1, theta_2):
+		theta_1 = theta_1 - np.pi/2
+
 		x = self.l2*np.cos(theta_1 + theta_2) + self.l1*np.cos(theta_1)
 		y = self.l2*np.sin(theta_1 + theta_2) + self.l1*np.sin(theta_1)
 
@@ -36,11 +38,11 @@ class Kinematics:
 
 		theta_1 = np.arctan2(y, x) - np.arctan2((self.l2*np.sin(theta_2)), (self.l1 + self.l2*np.cos(theta_2)))
 
-		# return np.pi/2 + theta_1, theta_2
-		return theta_1, theta_2
+		return np.pi/2 + theta_1, theta_2
+		# return theta_1, theta_2
 
 	def GetJacobian(self, theta_1, theta_2):
-		# theta_1 = theta_1 - np.pi/2
+		theta_1 = theta_1 - np.pi/2
 
 		J = np.array([
 					[- self.l1*np.sin(theta_1) - self.l2*np.sin(theta_1 + theta_2), -self.l2*np.sin(theta_1 + theta_2)],

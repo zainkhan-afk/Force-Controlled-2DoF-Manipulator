@@ -18,7 +18,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 sim = Simulation(width = SCREEN_WIDTH, height = SCREEN_HEIGHT, delta_T = TIME_STEP, PPM = PPM, FPS = TARGET_FPS)
 ground = Ground(sim)
 arm = Arm(sim, ground, position = (6.0, 6.0))
-pid_controller = PID(P = 300, I = 0, D = 50)
+pid_controller = PID(P = 1000, I = 10, D = 100)
 
 sim.AddEntity(arm)
 sim.AddEntity(ground)
@@ -40,7 +40,7 @@ print("Reached home position.")
 
 desired_state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
 
-goal_pos = np.array([0, -1])
+goal_pos = np.array([1, -1])
 
 ang = 0
 
