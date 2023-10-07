@@ -8,6 +8,7 @@ from ground import Ground
 from utils import *
 from state import State
 from Controller import PID
+from path import Path
 
 
 PPM = 50.0  # pixels per meter
@@ -20,8 +21,11 @@ ground = Ground(sim)
 arm = Arm(sim, ground, position = (6.0, 6.0))
 pid_controller = PID(P = 1000, I = 10, D = 100)
 
+path = Path()
+
 sim.AddEntity(arm)
 sim.AddEntity(ground)
+sim.AddEntity(path)
 
 home_pos_reached = False
 print("Going to home position.")
@@ -40,8 +44,6 @@ print("Reached home position.")
 
 desired_state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
 
-goal_pos = np.array([1, -1])
-
 ang = 0
 
 while True:
@@ -50,6 +52,7 @@ while True:
 	force = pid_controller.CalculateForce(ee_pos, goal_pos)
 	# force = arm.GetForce(desired_state)
 	# print(force)
+	# force = np.array([0, 0])
 	arm.ApplyForce(force)
 
 	# goal_pos[1] = 0.5*np.sin(ang)

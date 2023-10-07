@@ -14,6 +14,8 @@ class JointController:
 		self.error_sum = 0
 
 	def SetAngle(self, desired_angle):
+		if self.name == "j1":
+			desired_angle = desired_angle + np.pi/2
 		self.current_angle = self.joint.angle
 		error = desired_angle - self.current_angle
 
@@ -33,6 +35,6 @@ class JointController:
 		self.joint.motorSpeed = velocity
 
 	def GetAngle(self):
-		# if self.name == "j1":
-		# 	return self.joint.angle - np.pi/2
+		if self.name == "j1":
+			return self.joint.angle - np.pi/2
 		return self.joint.angle 

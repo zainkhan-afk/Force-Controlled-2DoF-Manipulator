@@ -70,8 +70,8 @@ class ArmDynamics:
 		r11 = a + b
 		r12 = self.m2*self.l2*gravity*np.cos(theta1 + theta2)
 		G = np.array([
-						[r11],
-						[r12]
+						[-r11],
+						[-r12]
 					 ])
 
 		return G
