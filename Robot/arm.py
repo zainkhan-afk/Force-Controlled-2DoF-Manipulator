@@ -13,7 +13,7 @@ from .Dynamics import ArmDynamics
 class Arm:
 	def __init__(self, sim_handle, ground, position = (0, 0)):
 		self.arm_width = 0.05
-		self.arm_segment_length = 0.8
+		self.arm_segment_length = 1.0
 
 		self.home_position = np.array([[0, -1.0]]).T
 
@@ -80,10 +80,9 @@ class Arm:
 	def UpdateState(self):
 		current_theta_1 = self.joint_1_controller.GetAngle()
 		current_theta_2 = self.joint_2_controller.GetAngle()
-
+		
 		self.state = self.state.UpdateUsingPosition(np.array([current_theta_1, current_theta_2]))
-		print(self.state)
-
+		
 	def ApplyForce(self, force):
 		current_theta_1 = self.joint_1_controller.GetAngle()
 		current_theta_2 = self.joint_2_controller.GetAngle()
@@ -109,6 +108,13 @@ class Arm:
 
 		self.joint_1_controller.SetAngle(desired_theta_1)
 		self.joint_2_controller.SetAngle(desired_theta_2)
+	
+	def GetJacobian(self):
+		current_theta_1 = self.state.theta[0]
+		current_theta_2 = self.state.theta[1]
+		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
+
+		return J
 
 	def ApplyState(self, desired_state):
 		desired_theta_1 = desired_state.theta[0]
@@ -117,14 +123,16 @@ class Arm:
 		self.joint_1_controller.SetAngle(desired_theta_1)
 		self.joint_2_controller.SetAngle(desired_theta_2)
 
+	def GetState(self):
+		return self.state
+
 
 	def GetEEPos(self):
-		theta_1 = self.joint_1_controller.GetAngle()
-		theta_2 = self.joint_2_controller.GetAngle()
+		current_theta_1 = self.state.theta[0]
+		current_theta_2 = self.state.theta[1]
 
-		# print("Angle", round(theta_1*180/np.pi, 2), round(theta_2*180/np.pi, 2))
+		position = self.kine_model.FK(current_theta_1, current_theta_2)
 
-		position = self.kine_model.FK(theta_1, theta_2)
 		return position
 	
 	def Render(self, screen, PPM):

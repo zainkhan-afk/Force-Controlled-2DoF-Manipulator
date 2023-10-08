@@ -31,6 +31,8 @@ class State:
 
 	def __str__(self):
 		return f'''
+	==========================================================
+	Robot State:
 		Theta: {self.theta[0], self.theta[1]}
 		Theta Dot: {self.theta_dot[0], self.theta_dot[1]}
 		Theta Double Dot: {self.theta_double_dot[0], self.theta_double_dot[1]}

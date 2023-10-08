@@ -12,13 +12,22 @@ class PID:
 		self.prev_error = np.array([0, 0]).astype("float32")
 		self.error_sum = np.array([0, 0]).astype("float32")
 
-	def CalculateForce(self, ee_pos, goal_pos):
-		error = goal_pos - ee_pos.ravel()
+		self.prev_goal_pos = None
 
+	def Solve(self, current_state, J, ee_pos, goal_pos):
+		# if self.prev_goal_pos is None:
+		# 	self.prev_goal_pos = goal_pos
+
+		# if (goal_pos != self.prev_goal_pos).all():
+		# 	self.error_sum = np.array([0, 0]).astype("float32")
+
+		error = goal_pos - ee_pos.ravel()
 		force = self.P*error + self.D*(self.prev_error - error) + self.I*self.error_sum
+
+		new_state = self.dynamicsSimulator.GoToNextStateFD(force, J, current_state)
 
 		self.prev_error = error
 		self.error_sum += error
-		# print(self.prev_error, error)
-		force = force.reshape(2, 1)
-		return force
+
+
+		return new_state
