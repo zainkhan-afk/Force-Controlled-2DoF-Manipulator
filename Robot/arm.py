@@ -52,7 +52,7 @@ class Arm:
 		self.joint_2_controller = JointController(joint_2, name = "j2")
 
 		self.kine_model = Kinematics(self.arm_segment_length, self.arm_segment_length)
-		self.dynamics = ArmDynamics(self.link_1.height, self.link_2.height, self.link_1.body.mass, self.link_2.body.mass)
+		self.dynamicsModel = ArmDynamics(self.link_1.height, self.link_2.height, self.link_1.body.mass, self.link_2.body.mass)
 
 		self.state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
 		
@@ -94,7 +94,7 @@ class Arm:
 
 		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
 		
-		theta_double_dot, _ = self.dynamics.ForwardDynamics(force, J, self.state)
+		theta_double_dot, _ = self.dynamicsModel.ForwardDynamics(force, J, self.state)
 
 		self.state = self.state.UpdateUsingAcceleration(np.array([theta_double_dot[0, 0], theta_double_dot[1, 0]]))
 
@@ -110,10 +110,12 @@ class Arm:
 		self.joint_1_controller.SetAngle(desired_theta_1)
 		self.joint_2_controller.SetAngle(desired_theta_2)
 
+	def ApplyState(self, desired_state):
+		desired_theta_1 = desired_state.theta[0]
+		desired_theta_2 = desired_state.theta[1]
 
-	def Render(self, screen, PPM):
-		self.link_1.Render(screen, PPM)
-		self.link_2.Render(screen, PPM)
+		self.joint_1_controller.SetAngle(desired_theta_1)
+		self.joint_2_controller.SetAngle(desired_theta_2)
 
 
 	def GetEEPos(self):
@@ -124,29 +126,7 @@ class Arm:
 
 		position = self.kine_model.FK(theta_1, theta_2)
 		return position
-
-	def GoToAngle(self, theta_1, theta_2):
-		self.joint_1_controller.SetAngle(theta_1)
-		self.joint_2_controller.SetAngle(theta_2)
-
-	def VerifyArmState(self, joint_vel):
-		print()
-		print(self.state.theta*180/np.pi)
-		theta_1 = self.joint_1_controller.GetAngle()
-		theta_2 = self.joint_2_controller.GetAngle()
-
-
-		print(theta_1*180/np.pi, theta_2*180/np.pi)
-
-		self.joint_1_controller.SetVelocity(joint_vel[0])
-		self.joint_2_controller.SetVelocity(joint_vel[1])
-
-		# self.state = self.state.UpdateUsingVelocity(joint_vel)
-
-	def GetForce(self, state):
-		current_theta_1 = self.joint_1_controller.GetAngle()
-		current_theta_2 = self.joint_2_controller.GetAngle()
-		J = self.kine_model.GetJacobian(current_theta_1, current_theta_2)
-		force = self.dynamics.InverseDynamics(J, state)
-
-		return force
+	
+	def Render(self, screen, PPM):
+		self.link_1.Render(screen, PPM)
+		self.link_2.Render(screen, PPM)

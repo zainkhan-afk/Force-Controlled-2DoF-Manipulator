@@ -1,7 +1,9 @@
 import numpy as np
+from Robot.Dynamics.simulateDynamics import SimulateDynamics
 
 class PID:
-	def __init__(self, P = 300, I = 0, D = 50):
+	def __init__(self, dynamicsModel, P = 300, I = 0, D = 50):
+		self.dynamicsSimulator = SimulateDynamics(dynamicsModel)
 		self.P = P;
 		self.I = I;
 		self.D = D;

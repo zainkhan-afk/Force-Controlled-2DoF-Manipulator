@@ -6,7 +6,7 @@ class Kinematics:
 		self.l1 = l1
 		self.l2 = l2
 
-		self.R_world_robot = GetRotationMatrix(np.pi/2)
+		# self.R_world_robot = GetRotationMatrix(np.pi/2)
 
 	def FK(self, theta_1, theta_2):
 		# theta_1 = theta_1 - np.pi/2

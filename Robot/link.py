@@ -18,6 +18,7 @@ class Link:
 			shape = fixture.shape
 			vertices = [(self.body.transform * v) * PPM for v in shape.vertices]
 			vertices = [(v[0], H - v[1]) for v in vertices]
+			# print(vertices)
 			pygame.draw.polygon(screen, self.color, vertices)
 
 	def GetTransform(self):
