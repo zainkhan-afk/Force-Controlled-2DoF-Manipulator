@@ -1,7 +1,9 @@
 import numpy as np
+from Robot.Dynamics.simulateDynamics import SimulateDynamics
 
 class PID:
-	def __init__(self, P = 300, I = 0, D = 50):
+	def __init__(self, dynamicsModel, P = 300, I = 0, D = 50):
+		self.dynamicsSimulator = SimulateDynamics(dynamicsModel)
 		self.P = P;
 		self.I = I;
 		self.D = D;
@@ -10,13 +12,28 @@ class PID:
 		self.prev_error = np.array([0, 0]).astype("float32")
 		self.error_sum = np.array([0, 0]).astype("float32")
 
-	def CalculateForce(self, ee_pos, goal_pos):
-		error = goal_pos - ee_pos.ravel()
+		self.prev_goal_pos = None
 
+	def Solve(self, current_state, J, ee_pos, goal_pos):
+		# if self.prev_goal_pos is None:
+		# 	self.prev_goal_pos = goal_pos
+
+		# if (goal_pos != self.prev_goal_pos).all():
+		# 	self.error_sum = np.array([0, 0]).astype("float32")
+
+		error = goal_pos - ee_pos.ravel()
 		force = self.P*error + self.D*(self.prev_error - error) + self.I*self.error_sum
+
+
+		new_state = self.dynamicsSimulator.GoToNextStateFD(force.reshape(len(force), 1), J, current_state)
 
 		self.prev_error = error
 		self.error_sum += error
-		# print(self.prev_error, error)
-		force = force.reshape(2, 1)
-		return force
+
+		# print("\nOld")
+		# print(current_state)
+
+		# print("New")
+		# print(new_state)
+
+		return new_state

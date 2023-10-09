@@ -6,23 +6,30 @@ class Kinematics:
 		self.l1 = l1
 		self.l2 = l2
 
-		self.R_world_robot = GetRotationMatrix(np.pi/2)
+		# self.R_world_robot = GetRotationMatrix(np.pi/2)
 
 	def FK(self, theta_1, theta_2):
+		# theta_1 = theta_1 - np.pi/2
+
 		x = self.l2*np.cos(theta_1 + theta_2) + self.l1*np.cos(theta_1)
 		y = self.l2*np.sin(theta_1 + theta_2) + self.l1*np.sin(theta_1)
 
 
 		position = np.array([[x, y]]).T
-		# position = self.R_world_robot.T@position
+		# position = self.R_world_robot@position
+
+		# print("FK", position.ravel())
 
 		return position
 
 
 	def IK(self, position):
 		# position = self.R_world_robot@position
+		# print("IK", position.ravel())
 		x = position[0, 0]
 		y = position[1, 0]
+
+		# print(x, y)
 
 		temp = (x**2 + y**2 - self.l1**2 - self.l2**2)/(2*self.l1*self.l2)
 
