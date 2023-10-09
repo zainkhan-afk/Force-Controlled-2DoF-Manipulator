@@ -17,13 +17,16 @@ class Path:
 		return None
 
 	def UpdateGoalPoint(self, ee_pos, thresh = 0.01):
+		if self.current_path_point_index >= (len(self.path) - 1):
+			return
+
 		goal_pt = self.GetCurrentGoalPoint()
 		if AlmostEqual(goal_pt.reshape(2, 1), ee_pos.reshape(2, 1), thresh = thresh):
 			self.current_path_point_index += 1
 			if self.current_path_point_index >= len(self.path):
 				self.current_path_point_index = len(self.path) - 1
 
-			print(f"Path point: {self.current_path_point_index}/{len(self.path)}")
+			print(f"Path point: {self.current_path_point_index + 1}/{len(self.path)}")
 
 	def AddPoint(self, point):
 		self.path.append(point)

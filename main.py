@@ -22,7 +22,7 @@ sim = Simulation(width = SCREEN_WIDTH, height = SCREEN_HEIGHT, delta_T = TIME_ST
 ground = Ground(sim)
 arm = Arm(sim, ground, position = ARM_POSITION)
 
-pid_controller = PID(arm.dynamicsModel, P = 100, I = 0.1, D = 1)
+pid_controller = PID(arm.dynamicsModel, P = 250, I = 0.25, D = 150)
 
 path = Path(size = 500, transform = ARM_POSITION)
 
@@ -30,13 +30,19 @@ path = Path(size = 500, transform = ARM_POSITION)
 ang = 0
 randius = 0.5
 
-num_pts = 50
+num_pts = 500
 for i in range(num_pts):
 	point = np.array([i/(num_pts/2) - 1, -1 + randius*np.sin(ang)])
-	point = np.array([i/(num_pts/2) - 1, -1])
+	# point = np.array([i/(num_pts/2) - 1, -1])
 	path.AddPoint(point)
 	ang += 0.1
-	randius -= 0.001
+	randius -= 0.002
+
+# point = np.array([ 1, 1])
+# path.AddPoint(point)
+
+# point = np.array([ -1, 1])
+# path.AddPoint(point)
 
 sim.AddEntity(arm)
 sim.AddEntity(ground)
@@ -67,10 +73,8 @@ current_thetas = []
 while True:
 	arm.UpdateState()
 	ee_pos = arm.GetEEPos()
-	path.UpdateGoalPoint(ee_pos)
+	path.UpdateGoalPoint(ee_pos, thresh = 0.01)
 	goal_pos = path.GetCurrentGoalPoint()
-
-	# print(ee_pos.ravel(), goal_pos.ravel())
 
 	current_state = arm.GetState()
 	J = arm.GetJacobian()

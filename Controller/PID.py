@@ -24,10 +24,16 @@ class PID:
 		error = goal_pos - ee_pos.ravel()
 		force = self.P*error + self.D*(self.prev_error - error) + self.I*self.error_sum
 
-		new_state = self.dynamicsSimulator.GoToNextStateFD(force, J, current_state)
+
+		new_state = self.dynamicsSimulator.GoToNextStateFD(force.reshape(len(force), 1), J, current_state)
 
 		self.prev_error = error
 		self.error_sum += error
 
+		# print("\nOld")
+		# print(current_state)
+
+		# print("New")
+		# print(new_state)
 
 		return new_state
