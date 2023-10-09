@@ -13,7 +13,7 @@ from .Dynamics import ArmDynamics
 class Arm:
 	def __init__(self, sim_handle, ground, position = (0, 0)):
 		self.arm_width = 0.05
-		self.arm_segment_length = 1.0
+		self.arm_segment_length = 0.9
 
 		self.home_position = np.array([[0, -1.0]]).T
 

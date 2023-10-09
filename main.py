@@ -32,7 +32,7 @@ randius = 0.5
 num_pts = 500
 for i in range(num_pts):
 	point = np.array([i/(num_pts/2) - 1, -1 + randius*np.sin(ang)])
-	# point = np.array([i/(num_pts/2) - 1, -1])
+	
 	path.AddPoint(point)
 	ang += 0.1
 	randius -= 0.002
