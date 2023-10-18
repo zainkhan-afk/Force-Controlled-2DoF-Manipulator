@@ -54,11 +54,20 @@ while not home_pos_reached:
 
 
 
+new_state = None
 arm.UpdateState()
 arm.UpdateState()
 print("Reached home position.")
 while True:
 	arm.UpdateState()
+
+
+	if new_state is not None:
+		error_state = arm.CalculateStateError(new_state)
+
+		print("Error between predicted state and current state")
+		print(error_state)
+
 	ee_pos = arm.GetEEPos()
 	path.UpdateGoalPoint(ee_pos, thresh = 0.01)
 	goal_pos = path.GetCurrentGoalPoint()

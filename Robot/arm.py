@@ -138,3 +138,7 @@ class Arm:
 	def Render(self, screen, PPM):
 		self.link_1.Render(screen, PPM)
 		self.link_2.Render(screen, PPM)
+
+	def CalculateStateError(self, state_pred):
+		error_state = self.state - state_pred
+		return error_state
