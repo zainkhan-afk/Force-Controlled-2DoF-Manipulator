@@ -6,6 +6,10 @@ class JointController:
 		self.name = name
 		self.current_angle = self.joint.angle 
 
+		self.P = 25
+		self.I = 0
+		self.D = 10
+
 		self.P = 10
 		self.I = 0
 		self.D = 2

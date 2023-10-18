@@ -37,3 +37,10 @@ class State:
 		Theta Dot: {self.theta_dot[0], self.theta_dot[1]}
 		Theta Double Dot: {self.theta_double_dot[0], self.theta_double_dot[1]}
 		'''
+
+	def __sub__(self, other):
+		error_theta = other.theta - self.theta
+		error_theta_dot = other.theta_dot - self.theta_dot
+		error_theta_double_dot = other.theta_double_dot - self.theta_double_dot
+
+		return State(error_theta, error_theta_dot, error_theta_double_dot)

@@ -6,7 +6,6 @@ from Robot import Arm
 from ground import Ground
 
 from utils import *
-from state import State
 from Controller import PID
 from path import Path
 
@@ -55,17 +54,20 @@ while not home_pos_reached:
 
 
 
+new_state = None
 arm.UpdateState()
 arm.UpdateState()
 print("Reached home position.")
-
-desired_state = State(np.array([0, 0]), np.array([0, 0]), np.array([0, 0]))
-
-step = 0
-new_thetas = []
-current_thetas = []
 while True:
 	arm.UpdateState()
+
+
+	if new_state is not None:
+		error_state = arm.CalculateStateError(new_state)
+
+		print("Error between predicted state and current state")
+		print(error_state)
+
 	ee_pos = arm.GetEEPos()
 	path.UpdateGoalPoint(ee_pos, thresh = 0.01)
 	goal_pos = path.GetCurrentGoalPoint()
@@ -77,33 +79,6 @@ while True:
 	new_state = pid_controller.Solve(current_state, J, ee_pos, goal_pos)
 	arm.ApplyState(new_state)
 
-	# print("Current: ", current_state.theta[0]*180/np.pi, current_state.theta[1]*180/np.pi)
-	# print("New: ", new_state.theta[0]*180/np.pi, new_state.theta[1]*180/np.pi)
-
-	# current_thetas.append(current_state.theta)
-	# new_thetas.append(new_state.theta)
-
-	# if step>10000:
-	# 	break
-
-
 	ret = sim.Step()
-	step += 1
 	if not ret:
 		sys.exit()
-
-new_thetas = np.array(new_thetas)
-current_thetas = np.array(current_thetas)
-
-plt.figure()
-plt.title("Theta 1 Graph")
-plt.plot(current_thetas[:, 0], label = "Theta 1 Current")
-plt.plot(new_thetas[:, 0], label = "Theta 1 New")
-plt.legend()
-
-plt.figure()
-plt.title("Theta 2 Graph")
-plt.plot(current_thetas[:, 1], label = "Theta 2 Current")
-plt.plot(new_thetas[:, 1], label = "Theta 2 New")
-plt.legend()
-plt.show()
